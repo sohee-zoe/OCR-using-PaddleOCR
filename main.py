@@ -1,33 +1,37 @@
+import os
 import cv2
 from paddleocr import PaddleOCR, draw_ocr
 from utils.image_util import plt_imshow, put_text
 from paddleocr.paddleocr import MODEL_URLS
+from typing import List, Dict, Optional, Tuple, Any
 
 
-class MyPaddleOCR:
+class OCR:
     def __init__(self, lang: str = "korean", **kwargs):
         self.lang = lang
-        self._ocr = PaddleOCR(lang="korean")
+        self._ocr = PaddleOCR(lang=self.lang, **kwargs)
         self.img_path = None
         self.ocr_result = {}
-    
-    def get_available_langs(self):
+
+    @staticmethod
+    def get_available_langs():
         langs_info = []
 
         for idx, model_name in enumerate(list(MODEL_URLS['OCR'].keys())):
             for lang in list(MODEL_URLS['OCR'][model_name]['rec'].keys()):
                 if lang not in langs_info:
                     langs_info.append(lang)
-        
         print('Available Language : {}'.format(langs_info))
-        
-    def get_available_models(self):
+
+    @staticmethod
+    def get_available_models():
         model_info = {}
 
         for idx, model_name in enumerate(list(MODEL_URLS['OCR'].keys())):
             model_info[model_name] = list(MODEL_URLS['OCR'][model_name]['rec'].keys())
-            print('#{} Model Vesion : [{}] - Language : {}'.format(idx+1, model_name, list(MODEL_URLS['OCR'][model_name]['rec'].keys())))
-        
+            print('#{} Model Vesion : [{}] - Language : {}'.format(idx + 1, model_name,
+                                                                   list(MODEL_URLS['OCR'][model_name]['rec'].keys())))
+
     def get_ocr_result(self):
         return self.ocr_result
 
@@ -36,7 +40,7 @@ class MyPaddleOCR:
 
     def show_img(self):
         plt_imshow(img=self.img_path)
-        
+
     def run_ocr(self, img_path: str, debug: bool = False):
         self.img_path = img_path
         ocr_text = []
@@ -53,7 +57,7 @@ class MyPaddleOCR:
             self.show_img_with_ocr()
 
         return ocr_text
-    
+
     def show_img_with_ocr(self):
         img = cv2.imread(self.img_path)
         roi_img = img.copy()
